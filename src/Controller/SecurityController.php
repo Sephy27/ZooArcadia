@@ -40,12 +40,7 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/mot-de-passe-oublie', name: 'forgotten_password')]
-    public function forgottenPassword(
-        Request $request,
-        UsersRepository $usersRepository,
-        JWTService $jwt,
-        SendEmailService $mail
-    ) : Response
+    public function forgottenPassword(Request $request, UsersRepository $usersRepository, JWTService $jwt, SendEmailService $mail) : Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
 
@@ -55,7 +50,7 @@ class SecurityController extends AbstractController
             // Le formulaire est envoyé ET valide
             // On va chercher l'utilisateur dans la base
             $user = $usersRepository->findOneByEmail($form->get('email')->getData());
-
+            
             // On vérifie si on a un utilisateur
             if($user){
                 // On a un utilisateur
@@ -65,17 +60,22 @@ class SecurityController extends AbstractController
                     'typ' => 'JWT',
                     'alg' => 'HS256'
                 ];
+                
 
                 // Payload
                 $payload = [
                     'user_id' => $user->getId()
                 ];
+                
 
                 // On génère le token
                 $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret'));
+                
+
 
                 // On génère l'URL vers reset_password
                 $url = $this->generateUrl('reset_password', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+                
 
                 // Envoyer l'e-mail
                 $mail->send(
@@ -103,26 +103,22 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/mot-de-passe-oublie/{token}', name: 'reset_password')]
-    public function resetPassword(
-        $token,
-        JWTService $jwt,
-        UsersRepository $usersRepository,
-        Request $request,
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $em
-    ): Response
+    public function resetPassword($token, JWTService $jwt, UsersRepository $usersRepository, Request $request, UserPasswordHasherInterface $passwordHasher, 
+    EntityManagerInterface $em): Response
     {
         
         // On vérifie si le token est valide (cohérent, pas expiré et signature correcte)
         if($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('app.jwtsecret'))){
             // Le token est valide
+             
+        
             // On récupère les données (payload)
             $payload = $jwt->getPayload($token);
             
             
             // On récupère le user
             $user = $usersRepository->find($payload['user_id']);
-
+            
             if($user){
                 $form = $this->createForm(ResetPasswordFormType::class);
 
@@ -132,7 +128,7 @@ class SecurityController extends AbstractController
                     $user->setPassword(
                         $passwordHasher->hashPassword($user, $form->get('password')->getData())
                     );
-
+                    
                     $em->flush();
 
                     $this->addFlash('success', 'Mot de passe changé avec succès');

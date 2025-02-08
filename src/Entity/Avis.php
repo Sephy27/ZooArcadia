@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
+
 use App\Repository\AvisRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
+
 class Avis
+
 {
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
