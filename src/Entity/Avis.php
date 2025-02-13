@@ -25,7 +25,7 @@ class Avis
     private ?string $comment = null;
 
     #[ORM\Column]
-    private ?bool $isVisible = null;
+    private ?bool $isVisible = false;
 
     #[ORM\ManyToOne(inversedBy: 'avis')]
     private ?Users $idUser = null;

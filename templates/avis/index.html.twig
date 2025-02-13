@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Donnez votre avis{% endblock %}
+
+{% block body %}
+<section class="container">
+    <h1>Postez votre avis</h1>
+    <div class="container d-flex align-self-center justify-content-center">
+        {{ form_start(avis) }}
+            {{ form_row(avis.nickname) }}
+            {{ form_row(avis.comment) }}
+            <button class="btn btn-lg bg-success m-2 text-light" type="submit">Envoyer</button>
+        {{ form_end(avis) }}
+    </div>
+</section>
+{% endblock %}
